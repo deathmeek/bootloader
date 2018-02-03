@@ -4,9 +4,6 @@
 /* tested with ATmega8, ATmega128 and ATmega168           */
 /* should work with other mega's, see code for details    */
 /*                                                        */
-/* ATmegaBOOT.c                                           */
-/*                                                        */
-/*                                                        */
 /* 20090308: integrated Mega changes into main bootloader */
 /*           source by D. Mellis                          */
 /* 20080930: hacked for Arduino Mega (with the 1280       */
@@ -113,7 +110,7 @@
 #define BL_PIN  PINF
 #define BL0     PINF7
 #define BL1     PINF6
-#elif defined __AVR_ATmega1280__ 
+#elif defined __AVR_ATmega1280__
 /* we just don't do anything for the MEGA and enter bootloader on reset anyway*/
 #else
 /* other ATmegas have only one UART, so only one pin is defined to enter bootloader */
@@ -1052,6 +1049,3 @@ void flash_led(uint8_t count)
 		_delay_ms(100);
 	}
 }
-
-
-/* end of file ATmegaBOOT.c */
