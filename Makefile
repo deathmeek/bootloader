@@ -41,12 +41,6 @@ ISPFUSES    = avrdude -c $(ISPTOOL) -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
 ISPFLASH    = avrdude -c $(ISPTOOL) -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
 -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
 
-STK500 = "C:\Program Files\Atmel\AVR Tools\STK500\Stk500.exe"
-STK500-1 = $(STK500) -e -d$(MCU_TARGET) -pf -vf -if$(PROGRAM)_$(TARGET).hex \
--lFF -LFF -f$(HFUSE)$(LFUSE) -EF8 -ms -q -cUSB -I200kHz -s -wt
-STK500-2 = $(STK500) -d$(MCU_TARGET) -ms -q -lCF -LCF -cUSB -I200kHz -s -wt
-
-
 OBJ        = $(PROGRAM).o
 OPTIMIZE   = -Os
 
@@ -213,10 +207,6 @@ mega_isp: isp
 isp: $(TARGET)
 	$(ISPFUSES)
 	$(ISPFLASH)
-
-isp-stk500: $(PROGRAM)_$(TARGET).hex
-	$(STK500-1)
-	$(STK500-2)
 
 %.elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
