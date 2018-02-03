@@ -1,0 +1,7 @@
+# add alphabetically
+*.bin
+*.elf
+*.hex
+*.lst
+*.o
+*.srec
