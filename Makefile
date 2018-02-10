@@ -16,7 +16,7 @@
 # etc...
 
 # program name should not be changed...
-PROGRAM    = ATmegaBOOT_168
+PROGRAM    = bootloader
 
 # enter the parameters for the avrdude isp tool
 ISPTOOL	   = stk500v2
