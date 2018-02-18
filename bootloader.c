@@ -110,7 +110,7 @@
 #define BL_PIN  PINF
 #define BL0     PINF7
 #define BL1     PINF6
-#elif defined __AVR_ATmega1280__
+#elif defined __AVR_ATmega1280__ || defined __AVR_ATmega324P__
 /* we just don't do anything for the MEGA and enter bootloader on reset anyway*/
 #else
 /* other ATmegas have only one UART, so only one pin is defined to enter bootloader */
@@ -129,6 +129,11 @@
 #define LED_PORT PORTB
 #define LED_PIN  PINB
 #define LED      PINB7
+#elif defined __AVR_ATmega324P__
+#define LED_DDR  DDRC
+#define LED_PORT PORTC
+#define LED_PIN  PINC
+#define LED      PINC0
 #else
 /* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */ 
 /* other boards like e.g. Crumb8, Crumb168 are using PB2 */
@@ -228,8 +233,12 @@
 #define SIG2	0x93
 #define SIG3	0x08
 #define PAGE_SIZE	0x20U	//32 words
-#endif
 
+#elif defined __AVR_ATmega324P__
+#define SIG2      SIGNATURE_1
+#define SIG3      SIGNATURE_2
+#define PAGE_SIZE (SPM_PAGESIZE/2) //words
+#endif
 
 /* function prototypes */
 void putch(char);
@@ -369,7 +378,7 @@ int main(void)
 	UBRRHI = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
 	UCSRA = 0x00;
 	UCSRB = _BV(TXEN)|_BV(RXEN);	
-#elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+#elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined (__AVR_ATmega324P__)
 
 #ifdef DOUBLE_SPEED
 	UCSR0A = (1<<U2X0); //Double speed mode USART0
@@ -679,7 +688,7 @@ int main(void)
 					 "rjmp	write_page	\n\t"
 					 "block_done:		\n\t"
 					 "clr	__zero_reg__	\n\t"	//restore zero register
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__)
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__) || defined(__AVR_ATmega324P__)
 					 : "=m" (SPMCSR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
 #else
 					 : "=m" (SPMCR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
@@ -928,7 +937,7 @@ void putch(char ch)
 		while (!(UCSR1A & _BV(UDRE1)));
 		UDR1 = ch;
 	}
-#elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+#elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined(__AVR_ATmega324P__)
 	while (!(UCSR0A & _BV(UDRE0)));
 	UDR0 = ch;
 #else
@@ -966,7 +975,7 @@ char getch(void)
 		return UDR1;
 	}
 	return 0;
-#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined(__AVR_ATmega324P__)
 	uint32_t count = 0;
 	while(!(UCSR0A & _BV(RXC0))){
 		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
@@ -1003,7 +1012,7 @@ void getNch(uint8_t count)
 			while(!(UCSR1A & _BV(RXC1)));
 			UDR1;
 		}
-#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__)
+#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined(__AVR_ATmega324P__)
 		getch();
 #else
 		/* m8,16,32,169,8515,8535,163 */

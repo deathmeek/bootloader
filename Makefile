@@ -19,9 +19,9 @@
 PROGRAM    = bootloader
 
 # enter the parameters for the avrdude isp tool
-ISPTOOL	   = stk500v2
+ISPTOOL	   = avrispmkii
 ISPPORT	   = usb
-ISPSPEED   = -b 115200
+ISPSPEED   = -B 1
 
 MCU_TARGET = atmega168
 LDSECTION  = --section-start=.text=0x3800
@@ -37,9 +37,9 @@ LDSECTION  = --section-start=.text=0x3800
 # unused, avrdude would get confused.
 
 ISPFUSES    = avrdude -c $(ISPTOOL) -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
--e -u -U lock:w:0x3f:m -U efuse:w:0x$(EFUSE):m -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
+-e -u -U lock:w:0x$(LOCK):m -U efuse:w:0x$(EFUSE):m -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
 ISPFLASH    = avrdude -c $(ISPTOOL) -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
--U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
+-U flash:w:$(PROGRAM)_$(TARGET).hex
 
 OBJ        = $(PROGRAM).o
 OPTIMIZE   = -Os
@@ -67,6 +67,7 @@ lilypad: $(PROGRAM)_lilypad.hex
 
 lilypad_isp: lilypad
 lilypad_isp: TARGET = lilypad
+lilypad_isp: LOCK  = 3F
 lilypad_isp: HFUSE = DD
 lilypad_isp: LFUSE = E2
 lilypad_isp: EFUSE = 00
@@ -79,6 +80,7 @@ lilypad_resonator: $(PROGRAM)_lilypad_resonator.hex
 
 lilypad_resonator_isp: lilypad_resonator
 lilypad_resonator_isp: TARGET = lilypad_resonator
+lilypad_resonator_isp: LOCK  = 3F
 lilypad_resonator_isp: HFUSE = DD
 lilypad_resonator_isp: LFUSE = C6
 lilypad_resonator_isp: EFUSE = 00
@@ -91,6 +93,7 @@ pro8: $(PROGRAM)_pro_8MHz.hex
 
 pro8_isp: pro8
 pro8_isp: TARGET = pro_8MHz
+pro8_isp: LOCK  = 3F
 pro8_isp: HFUSE = DD
 pro8_isp: LFUSE = C6
 pro8_isp: EFUSE = 00
@@ -103,6 +106,7 @@ pro16: $(PROGRAM)_pro_16MHz.hex
 
 pro16_isp: pro16
 pro16_isp: TARGET = pro_16MHz
+pro16_isp: LOCK  = 3F
 pro16_isp: HFUSE = DD
 pro16_isp: LFUSE = C6
 pro16_isp: EFUSE = 00
@@ -115,6 +119,7 @@ pro20: $(PROGRAM)_pro_20mhz.hex
 
 pro20_isp: pro20
 pro20_isp: TARGET = pro_20mhz
+pro20_isp: LOCK  = 3F
 pro20_isp: HFUSE = DD
 pro20_isp: LFUSE = C6
 pro20_isp: EFUSE = 00
@@ -127,6 +132,7 @@ diecimila: $(PROGRAM)_diecimila.hex
 
 diecimila_isp: diecimila
 diecimila_isp: TARGET = diecimila
+diecimila_isp: LOCK  = 3F
 diecimila_isp: HFUSE = DD
 diecimila_isp: LFUSE = FF
 diecimila_isp: EFUSE = 00
@@ -139,6 +145,7 @@ ng: $(PROGRAM)_ng.hex
 
 ng_isp: ng
 ng_isp: TARGET = ng
+ng_isp: LOCK  = 3F
 ng_isp: HFUSE = DD
 ng_isp: LFUSE = FF
 ng_isp: EFUSE = 00
@@ -154,6 +161,7 @@ atmega328: $(PROGRAM)_atmega328.hex
 atmega328_isp: atmega328
 atmega328_isp: TARGET = atmega328
 atmega328_isp: MCU_TARGET = atmega328p
+atmega328_isp: LOCK  = 3F
 atmega328_isp: HFUSE = DA
 atmega328_isp: LFUSE = FF
 atmega328_isp: EFUSE = 05
@@ -169,6 +177,7 @@ atmega328_notp: $(PROGRAM)_atmega328_notp.hex
 atmega328_notp_isp: atmega328_notp
 atmega328_notp_isp: TARGET = atmega328
 atmega328_notp_isp: MCU_TARGET = atmega328
+atmega328_notp_isp: LOCK  = 3F
 atmega328_notp_isp: HFUSE = DA
 atmega328_notp_isp: LFUSE = FF
 atmega328_notp_isp: EFUSE = 05
@@ -184,6 +193,7 @@ atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.hex
 atmega328_pro8_isp: atmega328_pro8
 atmega328_pro8_isp: TARGET = atmega328_pro_8MHz
 atmega328_pro8_isp: MCU_TARGET = atmega328p
+atmega328_pro8_isp: LOCK  = 3F
 atmega328_pro8_isp: HFUSE = DA
 atmega328_pro8_isp: LFUSE = FF
 atmega328_pro8_isp: EFUSE = 05
@@ -199,10 +209,26 @@ mega: $(PROGRAM)_atmega1280.hex
 mega_isp: mega
 mega_isp: TARGET = atmega1280
 mega_isp: MCU_TARGET = atmega1280
+mega_isp: LOCK  = 3F
 mega_isp: HFUSE = DA
 mega_isp: LFUSE = FF
 mega_isp: EFUSE = F5
 mega_isp: isp
+
+pm: MCU_TARGET = atmega324p
+pm: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=3' -DBAUD_RATE=57600
+pm: AVR_FREQ = 16000000L
+pm: LDSECTION  = --section-start=.text=0x7800
+pm: $(PROGRAM)_pm.hex
+
+pm_isp: pm
+pm_isp: TARGET = pm
+pm_isp: MCU_TARGET = atmega324p
+pm_isp: LOCK  = EF
+pm_isp: HFUSE = DA
+pm_isp: LFUSE = D7
+pm_isp: EFUSE = FD
+pm_isp: isp
 
 isp: $(TARGET)
 	$(ISPFUSES)
