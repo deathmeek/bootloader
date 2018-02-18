@@ -19,9 +19,9 @@
 PROGRAM    = bootloader
 
 # enter the parameters for the avrdude isp tool
-ISPTOOL	   = stk500v2
+ISPTOOL	   = avrispmkii
 ISPPORT	   = usb
-ISPSPEED   = -b 115200
+ISPSPEED   = -B 1
 
 MCU_TARGET = atmega168
 LDSECTION  = --section-start=.text=0x3800
