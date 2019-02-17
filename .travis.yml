@@ -6,4 +6,4 @@ addons:
     - gcc-avr
     - avr-libc
 
-script: make pm
+script: make lilypad lilypad_resonator pro8 pro16 pro20 diecimila ng atmega328 atmega328_notp atmega328_pro8 mega pm
