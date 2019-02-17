@@ -1,0 +1,9 @@
+language: c
+
+addons:
+  apt:
+    packages:
+    - gcc-avr
+    - avr-libc
+
+script: make pm
